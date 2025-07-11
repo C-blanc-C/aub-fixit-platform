@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUB FixIt - Campus Maintenance Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --aub-red: #8B0000;
+            --aub-gold: #FFD700;
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f6fa;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--aub-red);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .action-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .action-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .action-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Report Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        /* Issues List */
+        .issues-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .issues-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .issue-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .issue-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .issue-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .issue-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-open {
+            background: #fee;
+            color: var(--danger);
+        }
+
+        .status-in-progress {
+            background: #fef3cd;
+            color: var(--warning);
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: var(--success);
+        }
+
+        .issue-description {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .issue-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .upvote-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upvote-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .upvote-btn.upvoted {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Statistics Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Map Section */
+        #campus-map {
+            height: 400px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            text-align: center;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .modal-content {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Message */
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <h1>AUB FixIt</h1>
+                <span>Campus Maintenance Platform</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#home" onclick="showSection('home')">Home</a>
+                <a href="#issues" onclick="showSection('issues')">View Issues</a>
+                <a href="#map" onclick="showSection('map')">Campus Map</a>
+                <a href="#stats" onclick="showSection('stats')">Statistics</a>
+            </nav>
+            <div class="user-info">
+                <button onclick="showLoginModal()" style="background: none; border: none; color: white; cursor: pointer;">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home Section -->
+        <section id="home-section">
+            <div class="action-buttons">
+                <div class="action-card" onclick="openReportModal()">
+                    <i>🔧</i>
+                    <h3>Report an Issue</h3>
+                    <p>Found a maintenance problem? Let us know and we'll fix it!</p>
+                </div>
+                <div class="action-card" onclick="showSection('issues')">
+                    <i>📋</i>
+                    <h3>View All Issues</h3>
+                    <p>Browse reported issues and upvote the ones affecting you</p>
+                </div>
+                <div class="action-card" onclick="showSection('map')">
+                    <i>🗺️</i>
+                    <h3>Campus Map</h3>
+                    <p>See issues by location across AUB campus</p>
+                </div>
+                <div class="action-card" onclick="showSection('stats')">
+                    <i>📊</i>
+                    <h3>Statistics</h3>
+                    <p>View maintenance performance and trending issues</p>
+                </div>
+            </div>
+
+            <!-- Recent Issues Preview -->
+            <div class="issues-section">
+                <h2>Recent Reports</h2>
+                <div id="recent-issues">
+                    <!-- Issues will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Issues List Section -->
+        <section id="issues-section" style="display: none;">
+            <div class="issues-section">
+                <div class="issues-header">
+                    <h2>All Reported Issues</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterIssues('all')">All</button>
+                        <button class="filter-btn" onclick="filterIssues('open')">Open</button>
+                        <button class="filter-btn" onclick="filterIssues('in-progress')">In Progress</button>
+                        <button class="filter-btn" onclick="filterIssues('resolved')">Resolved</button>
+                    </div>
+                </div>
+                <div id="issues-list">
+                    <!-- Issues will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section id="map-section" style="display: none;">
+            <h2>Campus Issue Map</h2>
+            <div id="campus-map">
+                <div class="map-placeholder">
+                    <i style="font-size: 4rem;">🗺️</i>
+                    <p>Interactive campus map showing issue locations</p>
+                    <p style="font-size: 0.9rem; color: #999;">Click on markers to view issue details</p>
+                </div>
+            </div>
+            <div class="issues-section">
+                <h3>Issues by Building</h3>
+                <div id="building-issues">
+                    <!-- Building-specific issues will be listed here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section id="stats-section" style="display: none;">
+            <h2>Maintenance Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-issues">0</div>
+                    <div class="stat-label">Total Issues Reported</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="resolved-issues">0</div>
+                    <div class="stat-label">Issues Resolved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="response-time">24h</div>
+                    <div class="stat-label">Avg. Response Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="resolution-rate">0%</div>
+                    <div class="stat-label">Resolution Rate</div>
+                </div>
+            </div>
+            
+            <div class="issues-section">
+                <h3>Top Reported Categories</h3>
+                <canvas id="category-chart" width="400" height="200"></canvas>
+            </div>
+        </section>
+    </div>
+
+    <!-- Report Issue Modal -->
+    <div id="report-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeReportModal()">&times;</span>
+            <h2>Report a Maintenance Issue</h2>
+            
+            <div class="success-message" id="success-message">
+                Issue reported successfully! We'll address it as soon as possible.
+            </div>
+
+            <form id="report-form" onsubmit="submitReport(event)">
+                <div class="form-group">
+                    <label for="issue-title">Issue Title *</label>
+                    <input type="text" id="issue-title" required placeholder="Brief description of the problem">
+                </div>
+
+                <div class="form-group">
+                    <label for="issue-category">Category *</label>
+                    <select id="issue-category" required>
+                        <option value="">Select a category</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="plumbing">Plumbing</option>
+                        <option value="hvac">HVAC/Air Conditioning</option>
+                        <option value="cleanliness">Cleanliness</option>
+                        <option value="safety">Safety</option>
+                        <option value="furniture">Furniture/Equipment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="building">Building *</label>
+                    <select id="building" required>
+                        <option value="">Select building</option>
+                        <option value="jafet">Jafet Library</option>
+                        <option value="bechtel">Bechtel Engineering Building</option>
+                        <option value="bdh">Bechtel Design Hall</option>
+                        <option value="west-hall">West Hall</option>
+                        <option value="nicely">Nicely Hall</option>
+                        <option value="oxy">Oxy Building</option>
+                        <option value="bliss">Bliss Hall</option>
+                        <option value="post">Post Hall</option>
+                        <option value="outdoor">Outdoor Area</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Specific Location *</label>
+                    <input type="text" id="location" required placeholder="e.g., Room 201, 3rd floor bathroom, main entrance">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Detailed Description *</label>
+                    <textarea id="description" rows="4" required placeholder="Please provide details about the issue..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="urgency">Urgency Level</label>
+                    <select id="urgency">
+                        <option value="low">Low - Can wait</option>
+                        <option value="medium" selected>Medium - Should be fixed soon</option>
+                        <option value="high">High - Urgent attention needed</option>
+                        <option value="critical">Critical - Safety hazard</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="issue-image">Upload Image (optional)</label>
+                    <input type="file" id="issue-image" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label for="anonymous">
+                        <input type="checkbox" id="anonymous"> Report anonymously
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Report</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+            <h2>Login to AUB FixIt</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="login-username">Username or Email</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p style="margin-top: 1rem;">
+                    Don't have an account? 
+                    <a href="#" onclick="showRegisterModal(); return false;">Register here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeRegisterModal()">&times;</span>
+            <h2>Register for AUB FixIt</h2>
+            <form onsubmit="register(event)">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+                <p style="margin-top: 1rem;">
+                    Already have an account? 
+                    <a href="#" onclick="showLoginModal(); return false;">Login here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API Client Class
+        class FixItAPI {
+            constructor(baseURL = 'http://localhost:3000/api') {
+                this.baseURL = baseURL;
+                this.token = localStorage.getItem('token');
+            }
+
+            setToken(token) {
+                this.token = token;
+                localStorage.setItem('token', token);
+            }
+
+            clearToken() {
+                this.token = null;
+                localStorage.removeItem('token');
+            }
+
+            async request(endpoint, options = {}) {
+                const url = `${this.baseURL}${endpoint}`;
+                const config = {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers,
+                    }
+                };
+
+                if (this.token) {
+                    config.headers.Authorization = `Bearer ${this.token}`;
+                }
+
+                const response = await fetch(url, config);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+
+                return data;
+            }
+
+            // Auth methods
+            async register(username, email, password) {
+                const data = await this.request('/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, password })
+                });
+                this.setToken(data.token);
+                return data;
+            }
+
+            async login(username, password) {
+                const data = await this.request('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                this.setToken(data.token);
+                return data;
+            }
+
+            logout() {
+                this.clearToken();
+            }
+
+            // Issue methods
+            async getIssues(filters = {}) {
+                const params = new URLSearchParams(filters).toString();
+                return this.request(`/issues${params ? '?' + params : ''}`);
+            }
+
+            async getIssue(id) {
+                return this.request(`/issues/${id}`);
+            }
+
+            async createIssue(issueData, imageFile) {
+                const formData = new FormData();
+                Object.keys(issueData).forEach(key => {
+                    formData.append(key, issueData[key]);
+                });
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                const response = await fetch(`${this.baseURL}/issues`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+                return data;
+            }
+
+            async updateIssueStatus(id, status, notes) {
+                return this.request(`/issues/${id}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status, notes })
+                });
+            }
+
+            async toggleUpvote(issueId) {
+                return this.request(`/issues/${issueId}/upvote`, {
+                    method: 'POST'
+                });
+            }
+
+            async addComment(issueId, comment) {
+                return this.request(`/issues/${issueId}/comments`, {
+                    method: 'POST',
+                    body: JSON.stringify({ comment })
+                });
+            }
+
+            async getStatistics() {
+                return this.request('/statistics');
+            }
+        }
+
+        // Initialize API client - CHANGE THIS URL WHEN DEPLOYING
+        const api = new FixItAPI('http://localhost:3000/api'); // Change to your backend URL when deployed
+
+        // Sample data for demonstration (used when backend is not available)
+        const sampleIssues = [
+            {
+                id: 1,
+                title: "Broken power outlets at study tables",
+                category: "electrical",
+                building: "Bechtel Design Hall",
+                location: "2nd floor study area",
+                description: "Multiple power outlets at the study tables are not working, making it difficult for students to charge laptops.",
+                status: "open",
+                urgency: "high",
+                upvotes: 45,
+                created_at: "2024-01-07",
+                reporter_name: "Anonymous"
+            },
+            {
+                id: 2,
+                title: "Missing toilet seats in men's bathroom",
+                category: "plumbing",
+                building: "Bechtel Engineering Building",
+                location: "3rd floor men's bathroom",
+                description: "Two toilet seats are missing and one is the wrong size. No bidets available.",
+                status: "in-progress",
+                urgency: "medium",
+                upvotes: 32,
+                created_at: "2024-01-06",
+                reporter_name: "Student"
+            },
+            {
+                id: 3,
+                title: "Persistent odor in library bathroom",
+                category: "cleanliness",
+                building: "Jafet Library",
+                location: "2nd floor bathroom",
+                description: "Strong sewage smell that has persisted for weeks. Ventilation seems inadequate.",
+                status: "open",
+                urgency: "high",
+                upvotes: 67,
+                created_at: "2024-01-05",
+                reporter_name: "Multiple reports"
+            }
+        ];
+
+        // State management
+        let currentUser = null;
+        let issues = [];
+        let currentFilter = 'all';
+
+        // Check if user is logged in
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            if (token && user) {
+                currentUser = JSON.parse(user);
+                updateUIForAuth();
+            }
+        }
+
+        // Update UI based on authentication status
+        function updateUIForAuth() {
+            const userInfo = document.querySelector('.user-info');
+            if (currentUser) {
+                userInfo.innerHTML = `
+                    <span>👤 ${currentUser.username}</span>
+                    <button onclick="logout()" style="background: none; border: none; color: white; cursor: pointer;">Logout</button>
+                `;
+            } else {
+                userInfo.innerHTML = `
+                    <button onclick="showLoginModal()" style="background: none; border: none; color: white; cursor: pointer;">Login</button>
+                `;
+            }
+        }
+
+        // Login/Register functions
+        async function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                const response = await api.login(username, password);
+                currentUser = response.user;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                updateUIForAuth();
+                closeLoginModal();
+                loadIssues(); // Reload issues to show user-specific features
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        }
+
+        async function register(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            
+            try {
+                const response = await api.register(username, email, password);
+                currentUser = response.user;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                updateUIForAuth();
+                closeRegisterModal();
+            } catch (error) {
+                alert('Registration failed: ' + error.message);
+            }
+        }
+
+        function logout() {
+            api.logout();
+            currentUser = null;
+            localStorage.removeItem('user');
+            updateUIForAuth();
+            loadIssues();
+        }
+
+        // Load issues from backend
+        async function loadIssues() {
+            try {
+                const filters = currentFilter !== 'all' ? { status: currentFilter } : {};
+                issues = await api.getIssues(filters);
+                displayIssues();
+            } catch (error) {
+                console.error('Failed to load issues:', error);
+                // Fall back to sample data if backend is not available
+                issues = sampleIssues;
+                displayIssues();
+            }
+        }
+
+        // Display issues
+        function displayIssues() {
+            loadRecentIssues();
+            loadAllIssues();
+            updateBuildingIssues();
+        }
+
+        // Submit report with backend integration
+        async function submitReport(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                alert('Please login to report an issue');
+                showLoginModal();
+                return;
+            }
+            
+            const issueData = {
+                title: document.getElementById('issue-title').value,
+                category: document.getElementById('issue-category').value,
+                building: document.getElementById('building').options[document.getElementById('building').selectedIndex].text,
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value,
+                urgency: document.getElementById('urgency').value,
+                anonymous: document.getElementById('anonymous').checked
+            };
+            
+            const imageInput = document.getElementById('issue-image');
+            const imageFile = imageInput?.files[0];
+            
+            try {
+                await api.createIssue(issueData, imageFile);
+                
+                // Show success message
+                document.getElementById('success-message').style.display = 'block';
+                
+                // Reload issues
+                await loadIssues();
+                
+                // Reset form after delay
+                setTimeout(() => {
+                    closeReportModal();
+                }, 2000);
+            } catch (error) {
+                alert('Failed to submit report: ' + error.message);
+            }
+        }
+
+        // Show different sections
+        function showSection(section) {
+            // Hide all sections
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('issues-section').style.display = 'none';
+            document.getElementById('map-section').style.display = 'none';
+            document.getElementById('stats-section').style.display = 'none';
+            
+            // Show selected section
+            switch(section) {
+                case 'home':
+                    document.getElementById('home-section').style.display = 'block';
+                    break;
+                case 'issues':
+                    document.getElementById('issues-section').style.display = 'block';
+                    break;
+                case 'map':
+                    document.getElementById('map-section').style.display = 'block';
+                    break;
+                case 'stats':
+                    document.getElementById('stats-section').style.display = 'block';
+                    loadStatistics();
+                    break;
+            }
+        }
+
+        // Modal functions
+        function openReportModal() {
+            document.getElementById('report-modal').style.display = 'block';
+        }
+
+        function closeReportModal() {
+            document.getElementById('report-modal').style.display = 'none';
+            document.getElementById('report-form').reset();
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showLoginModal() {
+            document.getElementById('login-modal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        function showRegisterModal() {
+            document.getElementById('register-modal').style.display = 'block';
+            closeLoginModal();
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('register-modal').style.display = 'none';
+        }
+
+        // Load recent issues
+        function loadRecentIssues() {
+            const recentContainer = document.getElementById('recent-issues');
+            const recentIssues = issues.slice(0, 3);
+            
+            recentContainer.innerHTML = recentIssues.map(issue => createIssueCard(issue)).join('');
+        }
+
+        // Load all issues
+        function loadAllIssues() {
+            const issuesContainer = document.getElementById('issues-list');
+            let filteredIssues = issues;
+            
+            if (currentFilter !== 'all') {
+                filteredIssues = issues.filter(issue => issue.status === currentFilter);
+            }
+            
+            issuesContainer.innerHTML = filteredIssues.map(issue => createIssueCard(issue)).join('');
+        }
+
+        // Create issue card HTML
+        function createIssueCard(issue) {
+            const statusClass = `status-${issue.status.replace(' ', '-')}`;
+            const urgencyIcon = issue.urgency === 'critical' ? '🚨' : issue.urgency === 'high' ? '⚠️' : '';
+            const date = new Date(issue.created_at).toLocaleDateString();
+            
+            return `
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">${urgencyIcon} ${issue.title}</div>
+                            <div class="issue-meta">
+                                <span>📍 ${issue.building} - ${issue.location}</span>
+                                <span>📅 ${date}</span>
+                                <span>👤 ${issue.reporter_name || 'Anonymous'}</span>
+                            </div>
+                        </div>
+                        <span class="issue-status ${statusClass}">${issue.status.charAt(0).toUpperCase() + issue.status.slice(1)}</span>
+                    </div>
+                    <div class="issue-description">${issue.description}</div>
+                    <div class="issue-actions">
+                        <button class="upvote-btn" onclick="upvoteIssue(${issue.id})">
+                            👍 ${issue.upvotes || 0} Upvotes
+                        </button>
+                        <span style="color: #666; font-size: 0.9rem;">Category: ${issue.category}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Filter issues
+        function filterIssues(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadIssues();
+        }
+
+        // Upvote issue
+        async function upvoteIssue(issueId) {
+            if (!currentUser) {
+                alert('Please login to upvote issues');
+                showLoginModal();
+                return;
+            }
+            
+            try {
+                await api.toggleUpvote(issueId);
+                await loadIssues(); // Reload to show updated upvote count
+            } catch (error) {
+                console.error('Failed to upvote:', error);
+            }
+        }
+
+        // Update building issues for map section
+        function updateBuildingIssues() {
+            const buildingContainer = document.getElementById('building-issues');
+            const buildingGroups = {};
+            
+            issues.forEach(issue => {
+                if (!buildingGroups[issue.building]) {
+                    buildingGroups[issue.building] = [];
+                }
+                buildingGroups[issue.building].push(issue);
+            });
+            
+            let html = '';
+            for (const building in buildingGroups) {
+                html += `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">${building} (${buildingGroups[building].length} issues)</h4>
+                        ${buildingGroups[building].map(issue => `
+                            <div style="padding: 0.5rem 1rem; background: #f8f9fa; margin-bottom: 0.5rem; border-radius: 5px;">
+                                <strong>${issue.title}</strong> - ${issue.location}
+                                <span class="issue-status status-${issue.status.replace(' ', '-')}" style="float: right; font-size: 0.8rem;">
+                                    ${issue.status}
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            buildingContainer.innerHTML = html;
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const stats = await api.getStatistics();
+                
+                // Update stat cards
+                document.getElementById('total-issues').textContent = stats.total;
+                
+                const resolved = stats.byStatus.find(s => s.status === 'resolved');
+                if (resolved) {
+                    document.getElementById('resolved-issues').textContent = resolved.count;
+                    const rate = Math.round((resolved.count / stats.total) * 100);
+                    document.getElementById('resolution-rate').textContent = rate + '%';
+                }
+                
+                if (stats.avgResolutionDays) {
+                    document.getElementById('response-time').textContent = Math.round(stats.avgResolutionDays) + ' days';
+                }
+                
+                // Draw category chart with real data
+                drawCategoryChartWithData(stats.byCategory);
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+                // Use default values if backend is not available
+                drawCategoryChart();
+            }
+        }
+
+        // Enhanced category chart with real data
+        function drawCategoryChartWithData(categoryData) {
+            const canvas = document.getElementById('category-chart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#3498db';
+            
+            let x = 50;
+            const maxValue = Math.max(...categoryData.map(c => c.count));
+            
+            categoryData.forEach(({ category, count }) => {
+                const barHeight = (count / maxValue) * 150;
+                ctx.fillRect(x, 180 - barHeight, 40, barHeight);
+                
+                // Draw count on top of bar
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.fillText(count, x + 15, 175 - barHeight);
+                
+                // Draw category label
+                ctx.save();
+                ctx.translate(x + 20, 190);
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillText(category, 0, 0);
+                ctx.restore();
+                
+                ctx.fillStyle = '#3498db';
+                x += 60;
+            });
+        }
+
+        // Draw category chart (placeholder)
+        function drawCategoryChart() {
+            const canvas = document.getElementById('category-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Simple bar chart
+            const categories = {
+                'Electrical': 35,
+                'Plumbing': 28,
+                'HVAC': 22,
+                'Cleanliness': 19,
+                'Safety': 12,
+                'Furniture': 11
+            };
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#3498db';
+            
+            let x = 50;
+            let maxValue = Math.max(...Object.values(categories));
+            
+            Object.entries(categories).forEach(([category, value]) => {
+                const barHeight = (value / maxValue) * 150;
+                ctx.fillRect(x, 180 - barHeight, 40, barHeight);
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.save();
+                ctx.translate(x + 20, 190);
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillText(category, 0, 0);
+                ctx.restore();
+                
+                ctx.fillStyle = '#3498db';
+                x += 60;
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadIssues();
+        });
+    </script>
+</body>
+</html>
