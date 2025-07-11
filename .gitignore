@@ -1,0 +1,5 @@
+node_modules/
+.env
+fixit.db
+uploads/
+*.log
